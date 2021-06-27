@@ -1,0 +1,642 @@
+$ cd downloads
+$ unzip -d shellclass shellclass.zip
+
+VirtualBox (http://virtualbox.org)
+Physical computer is called "host"
+Virtual computer is called "guest"
+
+Vagrant Project = Folder with a Vagrantfile.
+$ mkdir vm1
+$ cd vm1
+
+Initialize the Vagrant Project
+$ vagrant init jasonc/centos7
+
+Vagrant will import the box into VirtualBox and start it
+$ vagrant up
+
+SSH- Secure Shell
+$ vagrant ssh [VM_NAME]
+
+Stops the VM		Starts the VM		Suspends the VM			Resume the VM			Removes the VM
+$ vagrant halt [VM_NAME]	$ vagrant up [VM_NAME]	$ vagrant suspend [VM_NAME]	$ vagrant resume [VM_NAME]		$ vagrant destroy [VM_NAME]
+
+Exit from VM
+$ exit
+
+Requires ssh client:
+Windows users: download Git from git-scm.com
+
+Vagrantfile
+---------------
+Vagrant.configure(2) do |config|
+       config.vm.box = "jasonc/centos7"
+       config.vm.hostname = "linuxsvr1"
+       config.vm.network "private_network", ip: "10.2.3.4"
+
+       #config.vm.provider "virtualbox" do |vb|
+       #vb.gui = true
+       #vb.memory = "1024"
+       #end
+
+       #config.vm.provision "shell", path: "setup.sh"
+       
+end
+
+Multiple VM Vagrantfile setup
+------------------------------------------
+Vagrant.configure(2) do |config|
+       config.vm.box = "jasonc/centos7"
+
+       config.vm.define "server1" do |server1|
+	server1.vm.hostname = "server1"
+	server1.vm.network "private_network", ip: "10.2.3.4"
+       end
+
+      config.vm.define "server2" do |server2|
+	server2.vm.hostname = "server2"
+	server2.vm.network "private_network", ip: "10.2.3.5"
+       end
+
+end
+
+mirror.linuxtrainingacademy.com :  install VM, install GIT, install Vagrant
+
+edit the vagrant config folder
+-------------------------------------------
+config.vm.box = "jasonc/centos7"
+config.vm.hostname = "testbox01"
+config.vm.network "private_network", ip: "10.9.8.7"
+
+save the file
+
+$ vagrant reload
+$ vagrant ssh
+
+To delete vagrant:
+$ vagrant destroy
+
+Multiple Virtual machine configuration
+-----------------------------------------------------
+config.vm.box = "jasonc/centos7"
+
+config.vm.define "test1" do |test1|
+        test1.vm.hostname = "test1"
+        test1.vm.network "private_network", ip: "10.9.8.5"
+end
+
+config.vm.define "test2" do |test2|
+        test2.vm.hostname = "test2"
+        test2.vm.network "private_network", ip: "10.9.8.6"
+end
+
+save the file
+
+$ vagrant up
+$ vagrant status
+
+$ vagrant ssh test1
+$ exit
+
+=========
+Notes
+=========
+
+#     = Sharp
+!      = Bang
+#!    = Shebang
+
+-rw-r--r--
+
+rw-   -------> represents the permission for owner of the file.
+r--     -------> represents the group of the file
+r--     -------> represents everyone has access the file
+
+for 'r' we provided 4, for 'w' we provided 2 and for 'x' we provided 1
+
+$ chmod 755 test.sh
+-rwxr-xr-x       ------>   rwx = 7,  r-x = 5,  r-x = 5
+
+Assign a value to a variable
+WORD='script'
+
+Display that value using the variable
+echo "$WORD"
+
+Combine the variable with hard-coded text
+echo "This is a shell $WORD"
+
+Display the contents of the variable using an alternative syntax
+echo "This is a shell ${WORD}"
+
+Append text to the variable
+echo "${WORD}ing is fun!"
+
+Create a new variable
+ENDING='ed' 
+
+Combine the two variables
+echo "This is ${WORD}${ENDING}."
+
+Change the value stored in the ENDING variable
+ENDING='ing'
+echo "${WORD}${ENDING} is fun!"
+
+Reassign value to ENDING
+ENDING='s'
+echo "You are going to write many ${WORD}${ENDING} in this class!"
+
+Display the UID and username of the user executing this script
+Display if the user is the root user or not.
+
+Display the UID
+echo "Your UID is ${UID}"
+
+Display the username
+#USER_NAME=$(id -un)
+USER_NAME=`id -un`
+echo "Your username is ${USER_NAME}"
+
+Display if the user is the root user or not
+if [[ "${UID}" -eq 0 ]]
+then
+    echo 'You are root.'
+else
+    echo 'You are not root.'
+fi
+
+--------------------------------------------------------------------------------------
+
+Display the UID and username of the user executing this script
+Display if the user is the vagrant user or not.
+
+Display the UID
+echo "Your UID is ${UID}"
+
+Only display if the UID does NOT match 1000.
+UID_TO_TEST_FOR='1000'
+if [[ "${UID}" -ne "${UID_TO_TEST_FOR}" ]]
+then
+  echo "Your UID does not match ${UID_TO_TEST_FOR}."
+  exit 1
+fi
+
+Display the username
+USER_NAME=$(id -un)
+
+Test if the command succeeded
+if [[ "${?}" -ne 0 ]]
+then
+  echo "The id command did not execute successfully."
+  exit 1
+fi
+echo "Your User Name is ${USER_NAME}"
+
+we can use a string test conditional
+USER_NAME_TO_TEST_FOR='vagrant'
+if [[ "${USER_NAME}" = "${USER_NAME_TO_TEST_FOR}" ]]
+then
+  echo "Your User name matches ${USER_NAME_TO_TEST_FOR}."
+fi
+
+Test for !=  (not equal) for the string
+if [[ "${USER_NAME}" != "${USER_NAME_TO_TEST_FOR}" ]]
+then
+   echo "Your user name does not match ${USER_NAME_TO_TEST_FOR}."
+   exit 1
+fi
+
+exit 0
+
+-------------------------------------------------------------------------------
+
+#!/bin/bash
+
+This script creates an account on the local system.
+You will be promted for the account name and password
+
+Ask for the user name
+read -p 'Enter the username to create: ' USER_NAME
+
+Ask for the real name
+read -p 'Enter the name of the person who this account is for: ' COMMENT
+
+Ask for the password
+read -p 'Enter the password to use for the account: ' PASSWORD
+
+Create the user
+useradd -c "${COMMENT}" -m ${USER_NAME}
+
+Set the password for the user
+echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+Force password change on first login
+passwd -e ${USER_NAME}
+
+To run the file:
+$ chmod +x luser-demo04.sh
+$ sudo ./luser-demo04.sh
+Enter the username to create: jsmith
+Enter the name of the person who this account is for: Jane Smith
+Enter the password to use for the account: jsmith123
+
+To change the password:
+$ su - jsmith
+New Password:
+Retype new password:
+
+To exit from the current user
+$ exit
+
+-----------------------------------------------------------------------------
+
+#!/bin/bash
+
+This script creates a new user on the local system
+You will be prompted to enter the username (login), the person name, and a password
+The username, password, and host for the account will be displayed
+
+Make sure the script is being executed with superuser privileges
+if [[ "${UID}" -ne 0 ]]
+then
+  echo 'Please run with sudo or as root.'
+  exit 1
+fi
+
+Get the username (login)
+read -p 'Enter the username to create: ' USER_NAME
+
+Get the real name (contents for the description field).
+read -p 'Enter the name of the person or application that will be using this account: ' COMMENT
+
+Get the password
+read -p 'Enter the password to use for the account: ' PASSWORD
+
+Create the account
+useradd -c "${COMMENT}" -m ${USER_NAME}
+
+Check to see if the useradd command succeeded
+We don't want to tell the user that an account was created when it hasn't been.
+if [[ "${?}" -ne 0 ]]
+then
+  echo 'The account could not be created.'
+  exit 1
+fi
+
+Set the password
+echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+if [[ "${?}" -ne 0 ]]
+then
+   echo 'The password for the account could not be set.'
+   exit 1
+fi
+
+Force password change on first login
+password -e ${USER_NAME}
+
+Display the username, password, and the host where the user was created
+echo 
+echo 'username:'
+echo "${USER_NAME}"
+echo
+echo 'password:'
+echo "${PASSWORD}"
+echo
+echo 'host:'
+echo "${HOSTNAME}"
+exit 0
+
+-----------------------------------------------------------------------------------------
+
+!#/bin/bash
+
+This script generates a list of random passwords
+
+A random number as a password
+PASSWORD="${RANDOM}"
+echo "${PASSWORD}"
+
+Three random numbers together
+PASSWORD="${RANDOM}${RANDOM}${RANDOM}"
+echo "${PASSWORD}"
+
+Use the current date/time as the basis for the password
+PASSWORD=$(date +%s)
+echo "${PASSWORD}"
+
+Use nanoseconds to act as randomization
+PASSWORD=$(date +%s%N)
+echo "${PASSWORD}"
+
+A better password
+PASSWORD=$(date +%s%N | sha256sum | head -c32)
+echo "${PASSWORD}"
+
+An even better password
+PASSWORD=$(date +%s%N${RANDOM}${RANDOM} | sha256sum | head -c48)
+echo "${PASSWORD}"
+
+Append a special character to the password
+SPECIAL_CHARACTER=$(echo '!@#$%^&*()_-+=' | fold -w1 | shuf | head -c1)
+echo "${PASSWORD}${SPECIAL_CHARACTER}"
+-----
+Create unique password
+$ date +%s | sha256sum
+
+----------------------------------------------------------------------------------
+
+#!/bin/bash
+
+This script generates a random password for each user specified on the command line.
+
+Display what the user typed on the command line.
+echo "You executed this command: ${0}"
+
+Display the path and filename of the script
+echo "You used $(dirname ${0}) as the path to the $(basename ${0}) script."
+
+Tell them how many arguments they passed in
+(Inside the script they are parameters, outside they are arguments.)
+NUMBER_OF_PARAMETERS="${#}"
+echo "You supplied ${NUMBER_OF_PARAMETERS} argument(s) on the command line."
+
+Make sure they at least supply one argument.
+if [[ "${NUMBER_OF_PARAMETERS}" -lt 1 ]]
+then
+   echo "Üsage: ${0} USER_NAME [USER_NAME]..."
+   exit 1
+fi
+
+Generate and display a password for each parameter
+for USER_NAME in "${@}"           ------------>  Generate number of passwords accord. to arguments 
+#for USER_NAME in "${*}"          ---------> Generate in one line not necessary to use
+do
+  PASSWORD=$(date +%s%N | sha256sum | head -c48)
+  echo "${USER_NAME}: ${PASSWORD}"
+done
+
+--------------------------------------------------------------------------------------
+
+#!/bin/bash
+
+This script generates a random password for each user specified on the command line.
+
+Display what the user typed on the command line.
+echo "Your executed this command: ${0}"
+
+Display the path and filename of the script
+echo "You used $(dirname ${0}) as the path to the $(basename ${0}) script."
+
+Tell them how many arguments they passed in.
+(Inside the script they are parameters, outside they are arguments.)
+NUMBER_OF_PARAMETERS="${#}"
+echo "You supplied ${NUMBER_OF_PARAMETERS} argument(s) on the command line."
+
+Make sure they at least supply ine argument.
+if [[ "${NUMBER_OF_PARAMETERS}" -lt 1 ]]
+then
+  echo "Usage: ${0} USER_NAME [USER_NAME]..."
+  exit 1
+fi
+
+Generate and display a password for each parameter.
+for USER_NAME in "${@}"
+do
+  PASSWORD=$(date +%s%N | sha256sum | head -c48)
+  echo "${USER_NAME}: ${PASSWORD}"
+done
+
+# Run the above programme: $ ./luser-demo06.sh a "b c" d
+Your supplied 3 arguments on the command line.
+# Run the above programme: $ ./luser-demo06.sh a "b c" d
+Your supplied 3 arguments on the command line.
+# Run the above programme: $ ./luser-demo06.sh 'a' 'b' 'c'
+Your supplied 3 arguments on the command line.
+
+----------------------------------------------------------------------
+
+#!/bin/bash
+
+Demonstrate the use of shift and while loops.
+
+Display the first three parameters
+echo "Parameter 1: ${1}"
+echo "Parameter 2: ${2}"
+echo "Parameter 3: ${3}"
+echo
+
+loop through all the positional parameters.
+while [[ "${#}" -gt 0 ]]
+do
+  echo "Number of parameters: ${#}"
+  echo "Parameter 1: ${1}"
+  echo "Parameter 2: ${2}"
+  echo "Parameter 3: ${3}"
+  echo
+  shift
+done
+
+-------------------------------------------------------------------------
+#!/bin/bash
+
+This script creates a new user on the local system.
+You must supply a username as an argument to the script
+Optionally you can also provide a comment for the account as an argument
+A password will be automatically generated for the account
+The username, password, and host for the account will be displayed.
+
+Make sure the script is being executed with superuser priviledges
+if [[ "${UID}" -ne 0 ]]
+then
+   echo 'Please run with sudo or as root.'
+   exit 1
+fi
+
+If they don't supply at least one argument, then give them help
+if [[ "${#}" -lt 1 ]]
+then 
+  echo "Usage: ${0} USER_NAME [COMMENT]..."
+  echo 'Create an account on the local system with the name of USER_NAME and a comments field of COMMENT.'
+  exit 1
+fi
+
+The first parameter is the user name
+USER_NAME="${1}"
+
+The rest of the parameters are for the account comments
+shift
+COMMENT="${@}"
+
+Generate a password
+PASSWORD=$(date +%s%N | sha256sum | head -c48)
+
+Create the user with the password
+useradd -c "${COMMENT}" -m ${USER_NAME}
+
+Check to see if the useradd command succeeded
+We don't want to tell the user that an account was created when it hasn't been
+if [[ "${?}" -ne 0 ]]
+then
+  echo 'The account could not be created.'
+  exit 1
+fi
+
+Set the Password
+echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+Check to see if the passwd command succeeded.
+if [[ "${?}" -ne 0 ]]
+then
+   echo 'The password for the account could not be set.'
+   exit 1
+fi
+
+Force password change on first login
+passwd -e ${USER_NAME}
+
+Display the username, password, and the host where the user was created.
+echo
+echo 'username:'
+echo "${USER_NAME}"
+echo
+echo 'password:'
+echo "${PASSWORD}"
+echo
+echo 'host:'
+echo "${HOSTNAME}"
+exit 0
+
+#To run above programme
+$ chmod 755 add-new-local-user.sh
+$ sudo ./add-new-local-user.sh jlocke John Locke
+
+------------------------------------------------------------------------------------
+
+#!/bin/bash
+
+This script demonstration I/O redirection
+
+
+Redirect STDOUT to a file
+FILE="/tmp/data"
+head -n1 /etc/passwd > ${FILE}
+
+Redirect STDIN to a program
+read LINE < ${FILE}
+echo "LINE contains: ${LINE}"
+
+Redirect STDOUT to a file, overwriting the file
+head -n3 /etc/passwd > ${FILE}
+echo
+echo "Contents of ${FILE}:"
+cat ${FILE}
+
+Redirect STDOUT to a file appending to the file
+echo "${RANDOM} ${RANDOM}" >> ${FILE}
+echo "${RANDOM} ${RANDOM}" >> ${FILE}
+echo
+echo "Contents of ${FILE}:"
+cat ${FILE}
+
+Redirect STDIN to a program, using FD 0
+read LINE 0< ${FILE}
+echo
+echo "LINE contains: ${LINE}"
+
+Redirect STDOUT to a file, using FD 1, overwriting the file
+head -n3 /etc/passwd 1> ${FILE}
+echo
+echo "Contents of ${FILE}:"
+cat ${FILE}
+
+#To run above programme
+$ cat password
+$ echo "another-line" >> password
+$ cat password
+$ date | sha256sum | head -c10 >> password
+
+----------------------------------------------------------
+
+FD 0 - STDIN  (FD: File Descriptor)
+FD 1 - STDOUT  
+FD 2 - STDERR  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

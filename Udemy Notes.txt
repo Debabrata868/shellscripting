@@ -1,0 +1,738 @@
+script.sh
+------------
+#!/bin/bash
+echo "Scripting is fun!"
+
+To run this file
+	$ chmod 755 script.sh
+	$ ./script.sh
+
+Shebang
+------------
+#!/bin/csh
+echo "The script uses csh as the interpreter"
+
+#!/bin/ksh
+echo "The script uses ksh as the interpreter"
+
+#!/bin/zsh
+echo "The script uses zsh as the interpreter"
+
+Variable
+------------
+#!/bin/bash
+MY_SHELL="bash"
+echo "I like the $MY_SHELL shell."     or
+echo "I like the ${MY_SHELL} shell."
+
+SERVER_NAME=$(hostname)
+echo "You are running this script on ${SERVER_NAME}."
+
+SERVER_NAME=`hostname`
+echo "You are running this script on ${SERVER_NAME}."
+
+File Operators
+---------------------
+-d FILE	:	True if file is a directory.
+-e FILE	:	True if file is exists.
+-f FILE	:	True if file is a exists and is a regular file.
+-r FILE	:	True if file is readable by you.
+-s FILE	:	True if file is exists and is not empty.
+-w FILE	:	True if file is writable by you.
+-x FILE	:	True if file is executable by you.
+
+-z STRING	True if String is empty.
+-n STRING	True if String is not empty.
+
+arg1 -eq arg2	True if arg1 is equal to arg2
+arg1 -ne arg2	True if arg1 is not equal to arg2
+
+arg1 -lt arg2	True if arg1 is less than arg2
+arg1 -le arg2	True if arg1 is less than or equal to arg2
+
+arg1 -gt arg2	True if arg1 is greater than arg2
+arg1 -ge arg2	True if arg1 is greater than or equal to arg2
+
+if Condition
+----------------
+#!/bin/bash
+MY_SHELL="csh"
+
+if [ "$MY_SHELL" = "bash" ]
+then
+    echo "You seem to like the bash shell."
+else
+    echo "You don't seem to like the bash shell."
+fi
+
+-------------------------------------------------------------------------
+
+if [ "$MY_SHELL" = "bash" ]
+then
+    echo "You seem to like the bash shell."
+elif [ "$MY_SHELL" = "csh" ]
+then
+    echo "You seem to like the csh shell."
+else
+    echo "You don't seem to like the bash or csh shell."
+fi
+
+for loop
+----------
+#!/bin/bash
+
+for COLOR in red green blue
+do
+   echo "COLOR: $COLOR"
+done
+
+------------------------------------------
+
+#!/bin/bash
+COLORS="red green blue"
+
+for COLOR in $COLORS
+do
+   echo "COLOR: $COLOR"
+done
+
+-------------------------------------------
+
+#!/bin/bash
+PICTURES=$(ls *jpg)
+DATE=$(date +%F)
+
+for PICTURE in $PICTURES
+do
+   echo "Renaming ${PICTURE} to ${DATE} -${PICTURE}"
+   mv ${PICTURE} ${DATE}-${PICTURE}
+done
+
+Positional Parameters
+-------------------------------
+$0 : "script.sh"
+$1 : "parameter1"
+$2 : "parameter2"
+$3 : "parameter3"
+
+#!/bin/bash
+
+echo "Executing script: $0"
+for USER in $@
+do
+  echo "Archiving user: $USER"
+  # Lock the account
+  password -1 $USER
+  # Create an archive of the home directory.
+  tar cf /archives/${USER}.tar.gz /home/${USER}
+done
+
+Exit Status / Return Code
+====================
+Range from 0-255
+
+0 = Success
+Other than 0 = error condition
+
+Host="google.com"
+ping -c 1 $HOST
+
+if [ "$?" -eq "0" ]
+  then 
+      echo "$HOST reachable."
+  else
+      echo "$HOST unreachable."
+fi
+
+-----------------------
+
+HOST="google.com"
+ping -c 1 $HOST
+RETURN_CODE=$?
+
+if [ "$RETURN_CODE" -ne "0" ]
+then
+   echo "$HOST unreachable."
+fi
+
+----------------------
+
+#!/bin/bash
+HOST="google.com"
+ping -c 1 $HOST
+if [ "$?" -ne "0" ]
+then
+  echo "$HOST unreachable." 
+  exit 1
+fi
+  exit 0
+
+Functions
+========
+#!/bin/bash
+
+function hello(){
+   echo "Hello!"
+   now
+}
+function now(){
+   echo "It's $(date +%r)"
+}
+hello
+----------------------
+
+#!/bin/bash
+my_function(){
+   GLOBAL_VAR=1
+}
+
+#GLOBAL_VAR not available yet.
+echo $GLOBAL_VAR
+my_function
+
+#GLOBAL_VAR is NOW available.
+echo $GLOBAL_VAR
+
+---------------------------
+
+function backup_file(){
+   if [ -f $1 ]
+   then
+       BACK="/temp/$ (basename ${1}) .$(date +%F) .$$"
+       echo "Backing up $1 to ${BACK}"
+       cp $1 $BACK
+   fi
+}
+backup_file /etc/hosts
+if [ $? -eq 0 ]
+then
+   echo "Backup succeeded!"
+fi
+
+----------------------
+
+function backup_file(){
+   if [ -f $1 ]
+   then
+       local BACK="/temp/$ (basename ${1}) .$(date +%F) .$$"
+       echo "Backing up $1 to ${BACK}"
+       #The exit status of the function will be the exit status of the cp command.
+       cp $1 $BACK
+   else
+       #The file does not exist.
+       return 1
+   fi
+}
+
+Wildcards
+=========
+-->A character or string used for pattern matching.
+-->Globbing expands the wildcard pattern into a list of files and/or directories. (paths)
+-->Wildcards can be used with most commands.
+      ls, rm, cp
+
+* ----> matches zero or more characters.
+e.g- *.txt, a*, a*.txt
+
+? ---> matches exactly one character.
+e.g- ?.txt, a?, a?.txt
+
+[ ] ---> matches any of the characters included between the brackets. Matches exactly one character.
+e.g- [aeiou], ca[nt]*
+
+[ ! ] ---> matches any of the characters NOT included between the brackets. Matches exactly one character.
+e.g- [ !aeiou ]*
+
+Named Character Classes
+--------------------------------------
+[[:alpha:]], [[:alnum:]], [[:digit:]], [[:lower:]], [[:space:]], [[:upper:]]
+
+\ --> escape character. matches all files that end with a question mark.
+e.g- *\?    done?
+
+$ cat copy-www.sh
+#!/bin/bash
+cd /var/www
+for FILE in *.html
+do
+   echo "Copying $FILE"
+   cp $FILE /var/www-just-html
+done
+
+To edit the .sh file
+------------------------
+$ vi copy-www.sh
+
+To save-   :wq
+
+Case Statements
+=================
+read -p "Enter y or n: " ANSWER
+case "ANSWER" in
+       [yY] | [yY] [eE] [sS] )
+             echo "You answered yes."
+              ;;
+       [nN] | [nN] [oO] )
+              echo "You answered no."
+              ;;
+        *)
+              echo "Invalid answer."
+              ;;
+esac
+
+Logging
+========
+The syslog standard uses facilities and severities to categorize messages.
+
+Facilities: kern, user, mail, daemon, auth, local0, local7
+Severities: emerg, alert, crit, err, warning, notice, info, debug
+
+Log file locations are configurable:
+/var/log/messages
+/var/log/syslog
+
+By default creates user.notice messages.
+
+e.g- logger "Message"
+        logger -p local0.info "Message"
+        logger -t myscript -p local0.info "Message"
+        logger -i -t myscript "Message"
+
+
+logit (){
+   local LOG_LEVEL=$1
+   shift
+   MSG=$@
+   TIMESTAMP=$ (date +"%Y-%m-%d %T" )
+   if [ $LOG_LEVEL = 'ERROR' ] || $VERBOSE
+   then
+      echo "${TIMESTAMP} ${HOST} ${PROGRAM_NAME} [${PID}] : ${LOG_LEVEL} ${MSG}"
+   fi
+}
+
+
+While Loop
+==========
+INDEX=1
+while [ $INDEX -lt 6 ]
+do
+   echo "Creating project-${INDEX}"
+   mkdir /usr/local/project-${INDEX} ( (INDEX++) )
+done
+
+Reading a File line by line
+------------------------------------
+LINE_NUM=1
+while read LINE
+do
+  echo "${LINE_NUM} : ${LINE}"
+  ( (LINE_NUM++) )
+done < /etc/fstab
+
+OR
+
+grep xfs /etc/fstab | while read LINE
+do
+   echo "xfs: ${LINE}"
+done
+
+OR
+
+FS_NUM=1
+grep xfs /etc/fstab | while read FS MP REST
+do
+   echo "${FS_NUM} : file system: ${FS}"
+   echo "${FS_NUM} : mount point: ${MP}"
+   ( (FS_NUM++) )
+done
+
+DB Backup
+----------------
+mysql -BNe 'show databases' | while read DB
+do
+   db-backend-up-recently $DB
+   if [ "$?" -eq "0" ]
+   then
+      continue
+   fi
+   backup $DB
+done
+
+DeBugging
+=========
+-x  ------> Prints commands as they execute
+#!/bin/bash -x
+
++x   ------> To stop debugging
+
+-e -------> Exit on error
+#!/bin/bash -ex
+#!/bin/bash -xe
+#!/bin/bash -x -e
+#!/bin/bash -e -x
+
+-v   ---------> Prints shell input lines as they are read.
+
+#!/bin/bash
+DEBUG=true
+if $DEBUG
+then
+   echo "Debug mode ON."
+else
+   echo "Debug mode OFF."
+fi
+
+#!/bin/bash
+debug() {
+   echo "Executing: $@"
+   $@
+}
+
+Sed And Streams
+===============
+Sed=Stream Editor
+A Stream is data that travels from:
+	--> One process to another through a pipe.
+	--> One file to another as a redirect.
+	--> One device to another.
+
+Sed performs text transformations on Streams.
+e.g- Substitute some text for other text.
+        Remove lines.
+        Append text after given lines.
+        Insert text before certain lines.
+
+$ type -a sed
+sed is /usr/bin/sed
+
+$ man sed	------->  Stream editor main page
+
+Substitute some text for other text.
+------------------------------------------------
+$ echo 'Debabrata is belongs to Puri.' > manager.txt
+$ cat manager.txt
+
+$ sed 's/belongs to/lives in/' manager.txt
+Debabrata is lives in Puri.
+
+For ignore the case sensitive first run this below cmd
+$ sed 's/search-pattern/replacement-string/flags' ctrl+c
+
+$ sed 's/BELONGS TO/lives in/i' manager.txt
+
+$ echo 'This is line 2.' >> manager.txt
+$ cat manager.txt
+Debabrata is belongs to Puri.
+This is line 2.
+
+Remove lines.
+--------------------
+$ sed '/This/d' manager.txt
+Debabrata is belongs to Puri.
+
+This Script extracts the audio from the mp4 file and converts it to mono
+
+#!/bin/bash
+
+INPUT_FILE=$1
+BASE_DIR=$ (dirname $INPUT_FILE)
+BASE_NAME=$ (basename -s .mp4 $INPUT_FILE)
+TMP_FILE=$ (mktemp --suffix=.wav)
+OUT_FILE="$BASE_DIR/$BASE_NAME.wav"
+
+# Extract the audio
+avconv -y -i $INPUT_FILE $TMP_FILE
+
+# Take audio from one channel to create
+# A mono wav file.
+sox $TMP_FILE -c 1 $OUT_FILE
+
+# Display the name of the file on the screen
+echo
+echo $OUT_FILE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

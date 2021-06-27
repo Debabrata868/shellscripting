@@ -1,0 +1,921 @@
+Shell Scripting
+============
+It is the series of commands for shell to execute. 
+
+Check the shell's are allow in OS
+	$cat /etc/shells        ---> where /etc is the root directory
+
+To create a file goto home
+	$ cd Desktop/
+  /Desktop$ touch hello.sh
+  /Desktop$ ls -l hello.sh          ----> To check the permissions allow for changes in the file
+  /Desktop$ gedit hello.sh       ----> Write shell script content in the file
+
+hello.sh
+=======
+#!/bin/bash
+
+#This is my First Shell Script
+echo "What is your name?"
+read Name
+
+echo "Hello,$Name"
+Save
+
+Ctrl+c for come outside from gedit
+
+  /Desktop$ ./hello.sh              	----> Permission Denied
+  /Desktop$ chmod +x hello.sh  -----> Execute the Permission allow
+
+  /Desktop$ ./hello.sh                  -----> To print the Hello message
+
+Variable declaration
+================
+#!/bin/bash
+
+#This is my First Shell Script
+
+WEBSITE_NAME="www.kkjavatutorials.com"
+
+echo "MyWebsite:$WEBSITE_NAME"
+
+echo "Bash Name:$BASH"
+
+echo "My Home Directory:$HOME"
+
+echo My present working directory: $PWD
+
+echo Path : $PATH
+
+readonly OS=Ubuntu
+echo $OS
+
+OS = "WINDOWS"          ------> Can't override the value of the variable OS as readonly
+
+YOUTUBE_CHANNEL = "KK JavaTutorials"
+echo $YOUTUBE_CHANNEL
+
+unset YOUTUBE_CHANNEL         --------> Unset will not print the KK JavaTutorials only display Print
+echo "Print: " $YOUTUBE_CHANNEL
+
+echo $$		--->1st $ print value of the varriable where 2nd $ print process ID of current shell
+
+$ls
+$cd ShellScript
+$gedit test.sh
+
+test.sh
+----------
+#!/bin/sh
+
+echo "Script File Name : $0"            ---------->$0 print the file script name
+echo "First Parameter : $1"
+echo "Second Parameter : $2"	       ----------->$1,$2,$3.... print the command line argument values
+echo "Third Parameter : $3"
+echo "Quoted Values : $@"
+echo "Quoted Values : $*"              
+echo "Total Number of Parameters : $#"        ---->Total number of parameters will be display
+
+commandlinescript.sh
+--------------------------------
+#!/bin/bash
+
+#echo $0 $1 $2 $3
+#echo $@
+args=("$@")
+
+echo ${args[0]} ,${args[1]} ,${args[2]} ,${args[3]}         ---->Print all command line argument in array
+
+userinput.sh
+-----------------
+#!/bin/bash
+
+echo "Enter Name:"
+read NAME
+echo "Name : $NAME"
+
+echo "Enter Name:"
+read 
+echo "Name : $REPLY"
+
+echo "Enter Names:"
+read NAME1 NAME2 NAME3
+echo $NAME1,$NAME2,$NAME3
+
+read -p 'username :' USERNAME
+read -sp 'Password :' PASSWORD
+echo
+echo "UserName : $USERNAME"
+echo "Password : $PASSWORD"
+
+echo "Enter Names :"
+read -a NAMES
+echo "Names : ${NAMES[0]} ,${NAMES[1]} ,${NAMES[2]} ,${NAMES[3]}"
+
+$ls -l arithmeticoperators.sh here execute not access so add below command
+$chmod +x arithmeticoperators.sh
+arithmeticoperators.sh
+-------------------------------
+#!/bin/bash
+
+read -p "Enter First Number :" n1
+read -p "Enter Second Number :" n2
+
+echo "Value of n1 = $n1"
+echo "Value of n2 = $n2"
+
+echo "Addition : `expr $n1 + $n2`"
+echo "Subtraction : `expr $n1 - $n2`"
+echo "Multiplication : `expr $n1 \* $n2`"
+echo "Division : `expr $n1 / $n2`"
+echo "Modulus Division : `expr $n1 % $n2`"
+
+echo "$n1+$n2" | bc             --------> where n1 & n2 values should be in floating point
+echo "$n1-$n2" | bc
+echo "$n1*$n2" | bc
+echo "scale = 2;$n1/$n2" | bc
+echo "$n1%$n2" | bc
+
+echo "scale=2;sqrt($n1)" | bc -l
+echo "scale=2;5^3" | bc -l
+
+$man bc                           -----------> Display all commands
+
+relationaloperations.sh
+-------------------------------
+#!/bin/bash
+
+read -p "Enter First Number :" n1
+read -p "Enter Second Number :" n2
+
+echo "Value of n1 = $n1"
+echo "Value of n2 = $n2"
+
+#Relational Operations: -eq(==), -ne(!=), -gt(>), -lt(<), -ge(>=), -le(<=)
+
+if([ $n1 -eq $n2 ])   -----> or if([ $n1 == $n2 ])
+ then
+   echo "Both numbers are equal"
+ else
+   echo "Both numbers are not equal"
+ fi
+
+booleanoperations.sh
+------------------------------
+#!/bin/bash
+
+read -p "Enter First Number :" n1
+read -p "Enter Second Number :" n2
+
+echo "Value of n1 = $n1"
+echo "Value of n2 = $n2"
+
+#Boolean Operators ( -a, -o ) in Bash
+
+if [ $n1 -gt 100 -a $n2 -gt 100 ]  
+ then
+   echo "Both numbers are greater than 100"
+ else
+   echo "Both numbers are not greater than 100"
+ fi
+
+-----------------------------------------------------------------------------
+
+if [ $n1 -gt 100 -o $n2 -gt 100 ]  
+ then
+   echo "Either of number is greater than 100"
+ else
+   echo "Both numbers are smaller than 100"
+ fi
+
+stringoperators.sh
+-------------------------
+#!/bin/bash
+
+read -p "Enter First String :" s1
+read -p "Enter Second String :" s2
+
+#String Operators ( = , != , -z , -n )
+
+echo "s1 = $s1"
+echo "s2 = $s2"
+
+if([ $s1 = $s2 ])
+  then
+     echo "Both Strings are equal"
+  else
+     echo "Both Strings are not equal"
+fi
+
+if([ $s1 != $s2 ])
+  then
+     echo "Both Strings are not equal"
+  else
+     echo "Both Strings are equal"
+fi
+
+if([  -z $s1 ])
+  then
+     echo "Strings has zero length"
+  else
+     echo "Strings has  non-zero length"
+fi
+
+if([ -n $s1 ])
+  then
+     echo "Strings has  non-zero length"
+  else
+     echo "Strings has zero length"
+fi
+
+filetestoperators.sh
+---------------------------
+#!/bin/bash
+
+read -p "Please Enter File Name : " fileName
+
+if([ -d $fileName ] )
+  then
+     echo "$fileName is a Directory"
+  else
+     echo "$fileName is a File"
+fi
+
+if([ -r $fileName ] )
+  then
+     echo "$fileName has read permission"
+  else
+     echo "$fileName doesn't has read permission"
+fi
+
+if([ -w $fileName ] )
+  then
+     echo "$fileName has write permission"
+  else
+     echo "$fileName doesn't has write permission"
+fi
+
+if([ -x $fileName ] )
+  then
+     echo "$fileName has execute permission"
+  else
+     echo "$fileName doesn't has execute permission"
+fi
+
+if([ -e $fileName ] )
+  then
+     echo "$fileName is Exist"
+  else
+     echo "$fileName doesn't Exist"
+fi
+
+-----------------------------------------------------------------------------
+
+To check execute permission given to user or not
+	$ ls -l ifelsestatements.sh
+To provide execute permission
+	$ chmod u+x ifelsestatements.sh
+ifelsestatements.sh
+----------------------------
+#!/bin/bash
+
+read -p "Enter a Number : " n
+
+if([ $n -le 100 ])
+  then
+     echo "Number is either 100 or less than 100"
+  elif([ $n -gt 100 -a $n -le 1000 ])
+     then
+        echo "Number is between 100 and 1000"
+     else
+        echo "Number is greater than 100"
+fi
+
+switchcase.sh
+----------------------
+#!/bin/bash
+
+read -p "Enter the Role : " ROLE
+
+case "$ROLE" in
+      "admin")
+     echo "You are $ROLE"
+     echo "Thanks"
+         ;;
+
+       "developer")
+     echo "You are $ROLE"
+     echo "Thanks"
+         ;;
+
+        "manager")
+     echo "You are $ROLE"
+     echo "Thanks"
+         ;;
+
+        *)			------------->  default case
+       echo "Invalid Role : $ROLE"
+         ;;
+esac
+
+casestatementwithregularexpression.sh
+-------------------------------------------------------
+#!/bin/bash
+
+read -p "Enter Server Name : " SERVER
+
+case "$SERVER" in
+	ws*.@host.com) echo "Web Server"
+	;;
+	db*.@host.com) echo "DB Server"	
+	;;
+	bk*.@host.com) echo "Backup Server"
+	;;
+	*)echo "Unkown Server"	
+	;;
+esac
+
+writedatatofile.sh
+-----------------------
+#!/bin/bash
+
+read -p "Enter File Name : " fileName
+
+if([ -e $fileName ])
+then
+  if([ -w $fileName ])
+  then
+     echo "Enter some text!! to exit press ctrl+d"
+     cat >> $fileName
+  else
+     echo "$fileName does not have write permission"
+  fi
+else
+  echo "$fileName does not Exist"
+fi
+
+To test
+========
+$ touch test.txt
+$ ls -l test.txt
+$ chmod -w test.txt  
+$ ./writedatatofile.sh
+
+$ chmod +w test.txt  
+$ ./writedatatofile.sh
+
+$ cat test.txt
+
+array.sh
+-----------
+#!/bin/bash
+
+animals=('cat' 'dog' 'cow' 'tiger')
+
+echo ${animals[*]}
+echo ${animals[@]}
+
+echo "First Element : ${animals[0]}"
+echo "Second Element : ${animals[1]}"
+
+animals[4]=`elephant`
+echo "${animals[*]}"
+
+#Print indices of an array
+
+echo "$(!animals[*]}"
+echo "$(!animals[@]}"
+
+#Print Length of an array
+
+echo "$(#animals[*]}"
+echo "$(#animals[@]}"
+
+unset animals[0]
+echo "${animals[*]}"
+
+text=abcdefgh
+echo ${text[0]}             -----------> It will print text
+echo ${text[1]}	  -----------> It will return nothing
+echo "${#text[@]}"
+
+whileloop.sh
+-----------------
+#!/bin/bash
+
+number=1
+
+while[ $number -le 10 ]
+do
+   echo $number
+   number=$(( number+1 ))
+done
+
+OR
+====
+
+number=1
+
+while(( $number <= 10 ))
+do
+   echo $number
+  # number=$(( number+1 ))
+  #(( number++ ))
+   (( ++number ))
+
+    sleep 1
+done
+
+readfilecontent.sh
+--------------------------
+#!/bin/bash
+
+:'
+#Method_1 to read file
+while read line 
+  do
+     echo $line
+  done < test.sh
+  #done < readfilecontent.sh
+'
+
+Multi line comments     :' ------------- '
+
+:'
+#Method_2 to read file
+cat readfilecontent.sh | while read line
+  do
+    echo $line
+  done
+
+#Method_3 to read file
+cat /etc/bash.bashrc | while read line
+  do
+    echo $line
+  done
+'
+
+#Method_4 to read file
+while IFS=' '  read -r line
+  do
+    echo $line
+  done < /etc/bash.bashrc
+
+untilloop.sh      (Opposite to while loop)
+==========
+#!/bin/bash
+
+number=1
+
+#until [ $number -gt 10 ]
+until (( $number > 10 ))
+do
+   echo $number
+   #number=$(( number+1 ))
+   #(( number++ ))
+     (( ++number ))
+done
+
+forloop
+======
+#!/bin/bash
+
+echo "First format of for loop.."
+
+for i in 1 2 3 4 5 6 7 8 9 10
+do
+  echo "Value of i = $i"
+done
+
+echo "Second format of for loop.."
+
+for i in {1..10}
+do
+  echo "Value of i = $i"
+done
+
+echo "Third format of for loop.."
+
+for i in {1..10..2}		----> 1,3,5,7,9  (Increment by 2)
+do
+  echo "Value of i = $i"
+done
+
+
+Notes: {1..10..2} this format is working only on bash $ echo $BASH_VERSION
+
+echo "Fourth format of for loop.."
+
+for (( i=1;i<=40;i=i+5 ))		
+do
+  echo "Value of i = $i"
+done
+
+forloopexecutecommands.sh
+=======================
+#!bin/bash
+
+:'
+for cmd in date pwd ls
+do
+   echo "------------$cmd-----------"
+   $cmd
+done
+'
+for item in *
+do
+  if [ -d $item ]
+    then
+        echo $item
+  fi
+done
+
+selectloop.sh
+===========
+#!/bin/bash
+
+select role in admin developer AVP VP MD
+do
+   echo "Selected Role is :$role"
+done
+
+-----------------------------------------------------------------
+
+select role in admin developer AVP VP MD
+do
+   case $role in
+   admin)
+         echo "Selected Role is :$role"
+         ;;
+   developer)
+         echo "Selected Role is :$role"
+         ;;
+    AVP)
+         echo "Selected Role is :$role"
+         ;;
+     VP)
+         echo "Selected Role is :$role"
+         ;;
+    MD)
+         echo "Selected Role is :$role"
+         ;;
+     *)
+       echo "Please select number between 1 to 5"
+   esac
+done
+
+breakandcontinue.sh
+=================
+#!/bin/bash
+
+for ((number=1;number<=10;number++ ))
+  do
+     if [  $number -eq 5  ]
+        then
+          break
+     fi
+     echo $number                            ----------------> 1 2 3 4
+  done
+
+-----------------------------------------------------------
+
+for ((number=1;number<=10;number++ ))
+  do
+     #if [  $number -eq 5  ]	------------------> 1 2 3 4 6 7 8 9 10
+       if [  $number -eq 5 -o $number -eq 10 ]	----------> 1 2 3 4 6 7 8 9
+        then
+          continue
+     fi
+     echo $number
+  done
+
+functiontest.sh
+===========
+#!/bin/bash
+
+function welcome(){                    ---------->  function keyword is optional
+#welcome(){
+  echo "Debabrata Das"
+}
+
+#Calling a function
+welcome
+------
+function welcome(){ 
+   echo "$1 Das"
+}
+welcome Debabrata
+-----
+function welcome(){ 
+   echo "$1 $2"		-------> Parameters are represents as $1, $2....
+}
+welcome Debabrata Das
+
+-------
+executeCommands(){
+  echo "-----------------------------$1---------------------------"
+  $1
+
+  echo "-----------------------------$2---------------------------"
+  $2
+
+  echo "-----------------------------$3---------------------------"
+  $3
+}
+
+executeCommands pwd date ls
+
+-----------------------------------------------------
+
+functionreturnvalues.sh
+===================
+#!/bin/bash
+
+add(){
+   echo -n "Enter First Number :"
+   read number2
+   echo -n "Enter Second Number :"
+   read number1
+
+   #sum=`expr $number1 + $number2`
+     sum=$(($number1 + $number2))
+   return $sum
+
+}
+#call method which returns value
+add 
+returnValue=$?
+echo "Sum :$returnValue"
+
+-----------------------------------------------
+
+localvariable.sh
+=============
+#!/bin/bash
+
+function executeCommand(){
+      local role=$1        			---------------->        local variable
+      echo "Command is executed for role :$role"       // AVP
+}
+
+role=admin         				----------------->     global variable
+echo "Command is executed for role :$role"     // admin 
+executeCommand AVP
+echo "Command is executed for role :$role"   // admin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
